@@ -7,12 +7,15 @@
 using namespace std;
 
 double func1(double x){
-    return exp(x)*sin(x);
-    //return pow(x,4)*log(x+sqrt(x*x+1));
+    return exp(-x*x);
 }
 
 double func2(double x, double a){
-    return sin(x)*cos(x);
+    return cos(x/a)*cos(x/M_PI);
+}
+
+double func3(double x, double a, double b, double c){
+    return (x-a)/((x-b)+c);
 }
 
 class damper{
@@ -22,33 +25,38 @@ class damper{
     public:
         damper(function<double(double)> damp_) : damp(damp_){
             value = romberg(damp, 0, 1);
-            cout << "VALUE: " << setprecision(20) << value << endl;
+            cout << "Damping function ready! Value: " << setprecision(20) << value << endl;
         }
+
+        void print_dump(double x){
+            cout << "Value of the damping function @ x = " << x << " : " << damp(x) << endl;
+        }
+
+
 };
 
 int main(){
     auto start = chrono::steady_clock::now();
     using namespace std::placeholders;
 
-    damper damp1(std::bind(func2, _1, 1.0));
+    cout << "----------------------------" << endl;
 
-    //auto integral = romberg(std::bind(func1, _1), 0, 2);
-    //double real_val = 5.39689100903380;
-    //cout << "Numerical value : " << setprecision(20) << integral  << endl;
-    //cout << "Real value      : " << setprecision(20) << real_val << endl;
-    //cout << "Error           : " <<  abs(integral-real_val) << endl;
+    damper damp1(std::bind(func2, _1, 2.0));
+    damp1.print_dump(0.5);
 
-    //vector<double> x = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    //vector<double> y = {func1(1), func1(2), func1(3), func1(4), func1(5), func1(6), func1(7), func1(8), func1(9), func1(10)};
+    cout << "----------------------------" << endl;
 
-    //array<double, 2> sol = polynomial_interpolation(x, y, 5.5);
-    //cout << "The interpolation yields: " << sol[0] << endl;
-    //cout << "The real value is: " << func1(5.5) << endl;
-    //cout << "Real error: " << abs(sol[0]-func1(5.5)) << endl;
-    //cout << "Estimated error: " << abs(sol[1]) << endl;
+    damper damp2(func1);
+    damp2.print_dump(0.5);
+
+    cout << "----------------------------" << endl;
+
+    cout << "Comparison of Romberg's method and Gauss-Legendre quadrature" << endl;
+    cout << "Romberg: " << setprecision(20) << romberg(std::bind(func3, _1, 5, 1, 2), 0, 1) << endl;
+    cout << "Gauss-Legendre (15 points): " << setprecision(20) << gauss_legendre_integration(std::bind(func3, _1, 5, 1, 2), 0, 1, 15) << endl;
 
     chrono::duration<double> elapsed_seconds = chrono::steady_clock::now()-start;
-    cout << "------------------------------------" << endl;
-    cout << "Elapsed time: " << elapsed_seconds.count() << "s" << endl;
+    cout << "----------------------------" << endl;
+    cout << "Elapsed time: " << setprecision(5) << elapsed_seconds.count() << "s" << endl;
     return 0;
 }
