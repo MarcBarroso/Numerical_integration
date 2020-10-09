@@ -29,10 +29,12 @@ class damper{
         }
 
         void print_dump(double x){
-            cout << "Value of the damping function @ x = " << x << " : " << damp(x) << endl;
+            cout << "Value of the damping function at x = " << x << " : " << damp(x) << endl;
         }
 
-
+        function<double(double)> damp_f(){
+            return damp;
+        }
 };
 
 int main(){
@@ -51,8 +53,13 @@ int main(){
 
     cout << "----------------------------" << endl;
 
+    auto test_f = damp2.damp_f();
+    cout << "This value should be the same as last one: " << test_f(0.5) << endl;
+
+    cout << "----------------------------" << endl;
+
     cout << "Comparison of Romberg's method and Gauss-Legendre quadrature" << endl;
-    cout << "Romberg: " << setprecision(20) << romberg(std::bind(func3, _1, 5, 1, 2), 0, 1) << endl;
+    cout << "Romberg                   : " << setprecision(20) << romberg(std::bind(func3, _1, 5, 1, 2), 0, 1) << endl;
     cout << "Gauss-Legendre (15 points): " << setprecision(20) << gauss_legendre_integration(std::bind(func3, _1, 5, 1, 2), 0, 1, 15) << endl;
 
     chrono::duration<double> elapsed_seconds = chrono::steady_clock::now()-start;
