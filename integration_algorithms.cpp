@@ -7,6 +7,8 @@
 
 using namespace std;
 
+constexpr MAX_STEPS = 100;
+
 double func1(double x){
     return exp(x)*sin(x);
     //return pow(x,4)*log(x+sqrt(x*x+1));
@@ -92,11 +94,10 @@ double romberg(function<double(double)> func, double a, double b)
     array<double, 2> sol;
 
     h.push_back(1.0);
-    for(int j=1;j<=100;j++){
+    for(int j=1;j<=MAX_STEPS;j++){
         s.push_back(trapezoid_rule(func, a, b, j));
         if(j >= K){
             sol = polynomial_interpolation(h, s, 0.0);
-            //cout << "s, j, sol[0], sol[1]: " << s.back() << " " << j << " " << sol[0] << " " << sol[1] << endl;
             if(abs(sol[1]) <= eps*abs(sol[0])) 
                 return sol[0];
         }
